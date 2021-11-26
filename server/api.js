@@ -6,8 +6,6 @@ const getUsers = (request, response) => {
             throw error
         }
         response.status(200).json(results.rows)
-        console.log(results)
-        console.log(results.rows)
     })
 }
 
@@ -22,9 +20,8 @@ const getUserById = (request, response) => {
 }
 
 const createUser = (request, response) => {
-    const {username, email} = request.body
-    console.log(username)
-    pool.query('INSERT INTO users (username, email) VALUES ($1, $2)', [username, email], (error, results) => {
+    const {username, email, password} = request.body
+    pool.query('INSERT INTO users (username, email, password) VALUES ($1, $2, $3)', [username, email, password], (error, results) => {
         if (error) {
             throw error
         }
@@ -33,12 +30,11 @@ const createUser = (request, response) => {
 }
 
 const updateUser = (request, response) => {
-    console.log('REQUETS', request.body)
     const id = parseInt(request.params.id)
-    const {username, email} = request.body
+    const {username, email, password} = request.body
     pool.query(
-    'UPDATE users SET username = $1, email = $2 WHERE id = $3',
-    [username, email, id],
+    'UPDATE users SET username = $1, email = $2 WHERE id = $4',
+    [username, email, password, id],
         (error, results) => {
         if (error) {
             throw error
