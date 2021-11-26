@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { Button, TextField, FormControl, Box}  from '@mui/material';
@@ -21,6 +21,7 @@ const validationSchema = yup.object({
 });
 
 function SignUp(){
+    const [status, setStatus] = useState('')
     const formik = useFormik({
     initialValues: {
         username: '',
@@ -28,11 +29,15 @@ function SignUp(){
         password: '',
     },
     validationSchema: validationSchema,
-    onSubmit: (values) => {
+    onSubmit: (values,actions) => {
         console.log(values)
-        axios.post('http://localhost:3000/users', {
-            values
+        axios.post('http://localhost:3000/signup', {
+            username : values.username,
+            email: values.email,
+            password: values.password
         }).catch(err => console.log(err))
+        actions.resetForm()
+        setStatus('The form has been submitted')
     },
     });
 
@@ -80,6 +85,7 @@ function SignUp(){
                 Submit
             </Button>
             </FormControl>
+            <div>{status}</div>
         </Box>
     )
 }

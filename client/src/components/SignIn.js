@@ -1,73 +1,72 @@
-import React, { useState, useReducer } from 'react';
-import {Form, Button, Container} from 'react-bootstrap'
+import React from 'react';
+import { useFormik } from 'formik';
+import * as yup from 'yup';
+import { Button, TextField, FormControl, Box}  from '@mui/material';
+import axios from 'axios'
 
-
-const formReducer = (state, event) => {
-    return {
-        ...state,
-        [event.name] : event.value
-    }
-}
+const validationSchema = yup.object({
+    email: yup
+        .string('Enter your email')
+        .email('Enter a valid email')
+        .required('Email is required'),
+    password: yup
+        .string()
+        .required('Password is required.') 
+        .min(8, 'Password is too short - should be 8 chars minimum.')
+});
 
 function SignIn(){
-    const [formData, setFormData] = useReducer(formReducer)
-    const [validated, setValidated] = useState(false)
+    const formik = useFormik({
+    initialValues: {
+        email: '',
+        password: '',
+    },
+    validationSchema: validationSchema,
+    onSubmit: (values) => {
+        console.log(values)
+        axios.post('http://localhost:3000/signin', {
+            email: values.email,
+            password: values.password,
+        }).catch(err => console.log(err))
+    },
+    });
 
-    const handleSubmit = (event) => {
-        event.preventDefault()
-        setValidated(true)
-    }
-
-    const handleChange = event => {
-        setFormData({
-            name: event.target.name,
-            value: event.target.value,
-        })
-    }
-
-    return(
-        <Container>
-            <Form
-            noValidate 
-            validated={validated}
-            onSubmit={handleSubmit}
+    return (
+        <Box
+            className="form-container"
+            onSubmit={formik.handleSubmit}
+            component="form"
+            className='form'
             >
-                <Form.Group className="mb-3" controlId="formBasicEmail">
-                    <Form.Label>Email address</Form.Label>
-                    <Form.Control 
-                        type="email" 
-                        name="email"
-                        placeholder="Enter email" 
-                        onChange={handleChange}
-                        required
-                    />
-                    <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
-                    <Form.Control.Feedback type="invalid">
-                        Please type an email.
-                    </Form.Control.Feedback>
-
-                    <Form.Label>Password</Form.Label>
-                    <Form.Control 
-                        type="password" 
-                        name="password"
-                        placeholder="Type password" 
-                        onChange={handleChange}
-                        required
-                    />
-                    <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
-                    <Form.Control.Feedback type="invalid">
-                        Please type a password.
-                    </Form.Control.Feedback>
-                </Form.Group>
-                <Button 
-                    variant="primary"
-                    type="submit"
-                    >
-                    Submit
-                </Button>
-            </Form>
-        </Container>
+            <FormControl>
+            <TextField
+                fullWidth
+                id="email"
+                name="email"
+                label="Email"
+                value={formik.values.email}
+                onChange={formik.handleChange}
+                error={formik.touched.email && Boolean(formik.errors.email)}
+                helperText={formik.touched.email && formik.errors.email}
+            />
+            <TextField
+                fullWidth
+                id="password"
+                name="password"
+                label="Password"
+                type="password"
+                value={formik.values.password}
+                onChange={formik.handleChange}
+                error={formik.touched.password && Boolean(formik.errors.password)}
+                helperText={formik.touched.password && formik.errors.password}
+            />
+            <Button color="primary" variant="contained" fullWidth type="submit">
+                Submit
+            </Button>
+            </FormControl>
+        </Box>
     )
 }
 
 export default SignIn
+

@@ -54,10 +54,23 @@ const deleteUser = (request, response) => {
     })
 }
 
+const signin = (request, response) => {
+    const {email, password} = request.body
+
+    console.log('EMAIL', email)
+    pool.query('SELECT * FROM users WHERE email = $1 AND password = $2', [email, password], (error, results) => {
+        if (error) {
+            throw error
+        }
+        response.status(200).json(results.rows)
+    })
+}
+
 module.exports = {
     getUsers,
     getUserById,
     createUser,
     updateUser,
     deleteUser,
+    signin
 }

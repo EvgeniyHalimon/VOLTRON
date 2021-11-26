@@ -7,3 +7,13 @@
 .MuiOutlinedInput-root{
     margin-bottom: 10px;
 }
+
+
+.navbar-nav a{
+    margin-right: 10px;
+    text-decoration: none;
+}
+
+.navbar-nav a:last-child{
+    margin-right: 0;
+}
