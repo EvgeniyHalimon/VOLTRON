@@ -1,4 +1,8 @@
 const pool = require('./connection')
+const bcrypt = require('bcrypt')
+const db = require('./models')
+const User = db.user
+const saltRounds = 10
 
 const getUsers = (request, response) => {
     pool.query('SELECT * FROM users ORDER BY id ASC', (error, results) => {
@@ -19,9 +23,13 @@ const getUserById = (request, response) => {
     })
 }
 
-const createUser = (request, response) => {
+const createUser = async (request, response) => {
     const {username, email, password} = request.body
-    pool.query('INSERT INTO users (username, email, password) VALUES ($1, $2, $3)', [username, email, password], (error, results) => {
+    const hash = await bcrypt.hash(password, saltRounds)
+    console.log(hash)
+    pool.query('INSERT INTO users (username, email, password) VALUES ($1, $2, $3)',
+    [username, email, hash],
+    (error, results) => {
         if (error) {
             throw error
         }
@@ -54,10 +62,13 @@ const deleteUser = (request, response) => {
     })
 }
 
-const signin = (request, response) => {
+const signin = async(request, response) => {
     const {email, password} = request.body
 
-    console.log('EMAIL', email)
+    const pass = await bcrypt.compare(password, (err, result) => {
+        console.log(result)
+    })
+    console.log(pass)
     pool.query('SELECT * FROM users WHERE email = $1 AND password = $2', [email, password], (error, results) => {
         if (error) {
             throw error

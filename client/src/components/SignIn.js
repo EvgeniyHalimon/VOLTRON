@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useState} from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { Button, TextField, FormControl, Box}  from '@mui/material';
@@ -16,19 +16,20 @@ const validationSchema = yup.object({
 });
 
 function SignIn(){
+    const [status, setStatus] = useState('')
     const formik = useFormik({
-    initialValues: {
-        email: '',
-        password: '',
-    },
-    validationSchema: validationSchema,
-    onSubmit: (values) => {
-        console.log(values)
-        axios.post('http://localhost:3000/signin', {
-            email: values.email,
-            password: values.password,
-        }).catch(err => console.log(err))
-    },
+        initialValues: {
+            email: '',
+            password: '',
+        },
+        validationSchema: validationSchema,
+        onSubmit: (values) => {
+            console.log(values)
+            axios.post('http://localhost:3000/signin', {
+                email: values.email,
+                password: values.password,
+            }).catch(err => console.log(err))
+        },
     });
 
     return (
