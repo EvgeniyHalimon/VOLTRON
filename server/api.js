@@ -1,7 +1,5 @@
 const pool = require('./connection')
 const bcrypt = require('bcrypt')
-const db = require('./models')
-const User = db.user
 const saltRounds = 10
 
 const getUsers = (request, response) => {
@@ -62,17 +60,17 @@ const deleteUser = (request, response) => {
     })
 }
 
-const signin = async(request, response) => {
+const signin = (request, response) => {
     const {email, password} = request.body
 
-    const pass = await bcrypt.compare(password, (err, result) => {
-        console.log(result)
-    })
-    console.log(pass)
-    pool.query('SELECT * FROM users WHERE email = $1 AND password = $2', [email, password], (error, results) => {
+    pool.query('SELECT * FROM users WHERE email = $1', [email], async(error, results) => {
         if (error) {
             throw error
         }
+        
+        const pass = await bcrypt.compare(password, results.rows[0].password)
+        console.log('results.rows[0].password: ', results.rows[0].password);
+        console.log('pass: ', pass);
         response.status(200).json(results.rows)
     })
 }
